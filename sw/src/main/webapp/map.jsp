@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.io.PrintWriter" %>
+<%@ page import="map.MapDAO" %>
+<%@ page import="map.Map" %>
+<%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +18,7 @@
         if (session.getAttribute("userID") != null) {
         	userID = (String) session.getAttribute("userID");
         }
+        int pageNumber =1;
     
     %>
     <nav class="navbar navbar-default">
@@ -68,6 +73,32 @@
       </nav>
       <div id="map" style="width: 500px; height: 400px;"></div> 
       <button id="getLocationBtn">내 위치로 이동</button>
+    <div class="container">
+    <div class="row">
+        <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
+            <thead>
+                <tr>
+                    <th style="background-color: #eeeeee; text-align: center;">ID</th>
+                    <th style="background-color: #eeeeee; text-align: center;">위도</th>
+                    <th style="background-color: #eeeeee; text-align: center;">경도</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    MapDAO mapDAO = new MapDAO();
+                    ArrayList<Map> list = mapDAO.getList(pageNumber);
+                    for(int i = 0; i < list.size(); i++) {
+                %>
+                <tr>
+                    <td><%= list.get(i).getMapID() %></td>
+                    <td><%= list.get(i).getLatitude() %></td> <!-- 위도 -->
+                    <td><%= list.get(i).getLongitude() %></td> <!-- 경도 -->
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
 	
 	
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2b25b23781322b72673233144779d42f"></script>
@@ -80,6 +111,17 @@
 	};
 
 	var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+	
+	<% for (int i = 0; i < list.size(); i++) { %>
+    var markerPosition = new kakao.maps.LatLng(<%= list.get(i).getLatitude() %>, <%= list.get(i).getLongitude() %>);
+    var marker = new kakao.maps.Marker({
+        position: markerPosition,
+        title: '<%= list.get(i).getMapID() %>' // 마커에 병원 이름 표시
+    });
+    marker.setMap(map); // 마커를 지도에 표시
+<% } %>
+	
+	
 	
 	var geoOptions = {
 		    enableHighAccuracy: true, // 정확한 위치 정보 사용
@@ -101,6 +143,8 @@
 	        alert('Geolocation을 사용할 수 없습니다.');
 	    }
 	});
+	
+	
 	
 	</script>
 	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>

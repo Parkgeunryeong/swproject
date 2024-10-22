@@ -33,7 +33,9 @@
            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
            <ul class="nav navbar-nav">
               <li class="active"><a href="main.jsp">메인</a></li>
-              <li><a href="bbs.jsp">게시판</a></li>
+              <li><a href="map.jsp">지도로 병원찾기</a></li>
+              <li><a href="">병원 검색하기</a></li>
+              <li><a href="">의료 정보 검색하기</a></li>
            </ul>
             <%
 		         if(userID == null) {
