@@ -9,7 +9,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-     <%
+<%
         String userID = null;
         if (session.getAttribute("userID") != null) {
         	userID = (String) session.getAttribute("userID");
@@ -57,6 +57,7 @@
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
 		               aria-expanded="false">회원관리<span class="caret"></span></a>
 		            <ul class="dropdown-menu">
+		               <li><a href="">내 정보</a></li>
 		               <li><a href="logoutAction.jsp">로그아웃</a></li>
 		            </ul>
 		           </li>
@@ -66,44 +67,25 @@
 		     %>
 		     </div>
       </nav>
-      <div id="map" style="width: 500px; height: 400px;"></div> 
-      <button id="getLocationBtn">내 위치로 이동</button>
-	
-	
-	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2b25b23781322b72673233144779d42f"></script>
-	<script type="text/javascript">
-	
-	var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
-	var options = { //지도를 생성할 때 필요한 기본 옵션
-		center: new kakao.maps.LatLng(37.4484304, 126.6571886), //지도의 중심좌표.
-		level: 3 //지도의 레벨(확대, 축소 정도)
-	};
-
-	var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
-	
-	var geoOptions = {
-		    enableHighAccuracy: true, // 정확한 위치 정보 사용
-		    timeout: 10000, // 10초 후 타임아웃
-		    maximumAge: 0 // 캐시된 위치 정보 사용하지 않음
-		};
-	document.getElementById('getLocationBtn').addEventListener('click', function() {
-	    if (navigator.geolocation) {
-	        navigator.geolocation.getCurrentPosition(function(position) {
-	            var lat = position.coords.latitude; // 위도
-	            var lon = position.coords.longitude; // 경도
-
-	            var locPosition = new kakao.maps.LatLng(lat, lon); // 사용자의 위치
-	            map.setCenter(locPosition); // 지도의 중심을 사용자의 위치로 설정
-	        }, function(error) {
-	            console.error('Error occurred. Error code: ' + error.code);
-	        }, geoOptions);
-	    } else {
-	        alert('Geolocation을 사용할 수 없습니다.');
-	    }
-	});
-	
-	</script>
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+      <div class="container">
+         <div class="jumbotron" style="background-color: blue;">
+            <div class="container">
+            <h1 align="center">
+                <a href="service_info.jsp" style="color: inherit; text-decoration: none;">의료 공지 및 서비스 정보</a>
+            </h1>
+            </div> 
+        </div>
+    </div>
+    <div class="container">
+         <div class="jumbotron" style="background-color: blue;">
+            <div class="container">
+            <h1 align="center">
+                <a href="community_info.jsp" style="color: inherit; text-decoration: none;">커뮤니티 게시판</a>
+            </h1>
+            </div> 
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="js/bootstrap.js"></script>
 
 </body>

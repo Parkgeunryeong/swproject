@@ -58,6 +58,7 @@
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
 		               aria-expanded="false">회원관리<span class="caret"></span></a>
 		            <ul class="dropdown-menu">
+		               <li><a href="">내 정보</a></li>
 		               <li><a href="logoutAction.jsp">로그아웃</a></li>
 		            </ul>
 		           </li>
@@ -98,7 +99,7 @@
     <div class="jumbotron" style="background-color: red;">
         <div class="container">
             <h1 align="center">
-                <a href="" style="color: inherit; text-decoration: none;">의료 정보 게시판</a>
+                <a href="info.jsp" style="color: inherit; text-decoration: none;">의료 정보 게시판</a>
             </h1>
         </div> 
     </div>
