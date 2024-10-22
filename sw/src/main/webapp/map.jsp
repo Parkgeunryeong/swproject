@@ -86,15 +86,11 @@
             <tbody>
                 <%
                     MapDAO mapDAO = new MapDAO();
-                    ArrayList<Map> list = mapDAO.getList(pageNumber);
-                    for(int i = 0; i < list.size(); i++) {
+                    ArrayList<Map> list = mapDAO.getList();
+                    
                 %>
-                <tr>
-                    <td><%= list.get(i).getMapID() %></td>
-                    <td><%= list.get(i).getLatitude() %></td> <!-- 위도 -->
-                    <td><%= list.get(i).getLongitude() %></td> <!-- 경도 -->
-                </tr>
-                <% } %>
+                
+                
             </tbody>
         </table>
     </div>
@@ -111,6 +107,7 @@
 	};
 
 	var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+	var infowindow = new kakao.maps.InfoWindow();
 	
 	<% for (int i = 0; i < list.size(); i++) { %>
     var markerPosition = new kakao.maps.LatLng(<%= list.get(i).getLatitude() %>, <%= list.get(i).getLongitude() %>);
@@ -119,7 +116,31 @@
         title: '<%= list.get(i).getMapID() %>' // 마커에 병원 이름 표시
     });
     marker.setMap(map); // 마커를 지도에 표시
+
+    (function(marker, data) {
+        kakao.maps.event.addListener(marker, 'click', function() {
+            var content = `
+                <div style="padding:10px;">
+                    <table border="1" style="border-collapse:collapse; text-align:left;">
+                        <tr>
+                            <th>이름</th><td><%= list.get(i).getMapID() %></td>
+                        </tr>
+                        <tr>
+                            <th>주소</th><td>주소 정보</td> 
+                        </tr>
+                    </table>
+                </div>
+            `;
+            infowindow.setContent(content); // 인포윈도우 내용 설정
+            infowindow.open(map, marker); // 인포윈도우 열기
+        });
+    })(marker, {
+        name: '<%= list.get(i).getMapID() %>',
+        address: '주소 정보' 
+    });
 <% } %>
+
+    
 	
 	
 	
