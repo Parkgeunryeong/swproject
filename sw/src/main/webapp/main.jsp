@@ -35,7 +35,17 @@
               <li class="active"><a href="main.jsp">메인</a></li>
               <li><a href="map.jsp">지도로 병원찾기</a></li>
               <li><a href="">병원 검색하기</a></li>
-              <li><a href="">의료 정보 검색하기</a></li>
+              <li class="dropdown">
+		            <a href="#" class="dropdown-toggle"
+		               data-toggle="dropdown" role="button" aria-haspopup="true"
+		               aria-expanded="false">의료정보게시판<span class="caret"></span></a>
+		            <ul class="dropdown-menu">
+		               <li><a href="">의료 공지</a>
+		               <li><a href="">의료 커뮤니티 게시판</a>
+		            </ul>
+		           </li>
+    
+                    
            </ul>
             <%
 		         if(userID == null) {
@@ -101,7 +111,7 @@
     <div class="jumbotron" style="background-color: red;">
         <div class="container">
             <h1 align="center">
-                <a href="info.jsp" style="color: inherit; text-decoration: none;">의료 정보 게시판</a>
+                <a href="info.jsp" style="color: inherit; text-decoration: none;">의료 공지</a>
             </h1>
         </div> 
     </div>
