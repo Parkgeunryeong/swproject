@@ -31,6 +31,8 @@
         }
     
     %>
+    
+    
     <nav class="navbar navbar-default">
            <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed"
@@ -47,7 +49,7 @@
            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
            <ul class="nav navbar-nav">
               <li class="active"><a href="main.jsp">메인</a></li>
-              <li><a href="community_info.jsp">게시판</a></li>
+              <li><a href="bbs.jsp">게시판</a></li>
            </ul>
             <%
 		         if(userID == null) {
@@ -95,55 +97,37 @@
                              </tr>
                       </thead>
                        <tbody>
-                        <%
-	                         CommunityDAO communityDAO = new CommunityDAO();
-	                         ArrayList<Community> list = communityDAO.getList(pageNumber);
-	                         for(int i =0; i < list.size(); i++) {
-	                     %>
-                            <tr>
-                             <td><%= list.get(i).getCom_date().substring(0, 11) + list.get(i).getCom_date().substring(11, 13) + "시" + list.get(i).getCom_date().substring(14, 16 ) + "분"  %></td>
-                             <td><a href ="viewcom.jsp?com_id=<%= list.get(i).getCom_id() %>"> <%= list.get(i).getCom_title() %></a></td>
-                             <td><%= list.get(i).getUserID() %> </td>
-                             
-                            </tr>	
-                      <%    
-	                         }
-	                     
-	                     
-	                     
-	                     %>
-                      
-                      </tbody>
+    <%
+        CommunityDAO communityDAO = new CommunityDAO();
+        ArrayList<Community> list = communityDAO.getSearch(request.getParameter("searchField"),
+                request.getParameter("searchText"));
+        if (list.size() == 0) {
+            PrintWriter script = response.getWriter();
+            script.println("<script>");
+            script.println("alert('검색결과가 없습니다.')");
+            script.println("history.back()");
+            script.println("</script>");
+        }
+        for (int i = 0; i < list.size(); i++) {
+    %>
+    <tr>
+        
+        <%-- 현재 게시글에 대한 정보 --%>
+        <td><%= list.get(i).getCom_date().substring(0, 11) + list.get(i).getCom_date().substring(11, 13) + "시"
+        + list.get(i).getCom_date().substring(14, 16) + "분" %></td>
+        <td><a href="viewcom.jsp?com_id=<%= list.get(i).getCom_id() %>"><%= list.get(i).getCom_title().replaceAll(" ", "&nbsp;").replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;").replaceAll("\n", "<br>") %></a></td>
+        <td><%= list.get(i).getUserID() %></td>
+        
+    </tr>
+    <%
+        }
+    %>
+</tbody>
+                       
                       
                 </table>
-                 <div class=container style="text-align: center">
-				<%
-					if (pageNumber != 1) {//이전페이지로
-				%>
-				<a href="community_info.jsp?pageNumber=<%=pageNumber - 1%>">◀ 이전</a>
-				<%
-					}
-				%>
-				<%
-					int n = (int) (communityDAO.getCount() / 10 + 1);
-					for (int i = 1; i <= n; i++) {
-				%>
-				<a href="community_info.jsp?pageNumber=<%=i%>" style="<%= (i ==pageNumber ) ? "color: blue; font-weight: bold;" : "" %>">|<%=i%>|
-                </a>
-				
-				<%
-					}
-				%>
-				<%
-					if (communityDAO.nextPage(pageNumber + 1)) {//다음페이지가 존재하는가?
-				%>
-				<a href="community_info.jsp?pageNumber=<%=pageNumber + 1%>">다음 ▶</a>
-				<%
-					}
-				%>
-				<a href="write.jsp" class="btn btn-success pull-right">글쓰기</a>
-			</div>
-                
+                <a href="write.jsp" class="btn btn--primary pull-right">글쓰기</a>
                 </div>
                 </div>
                 <div class="container">

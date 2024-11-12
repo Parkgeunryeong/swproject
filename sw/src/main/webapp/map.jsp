@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.io.PrintWriter" %>
-<%@ page import="map.MapDAO" %>
-<%@ page import="map.Map" %>
+<%@ page import="hospital.Hospital" %>
+<%@ page import="hospital.HospitalDAO" %>
 <%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
@@ -82,7 +82,7 @@
 		     %>
 		     </div>
       </nav>
-      <div id="map" style="width: 500px; height: 400px;"></div> 
+      <div id="map" style="width: 700px; height: 600px;"></div> 
       <button id="getLocationBtn">내 위치로 이동</button>
     <div class="container">
     <div class="row">
@@ -96,14 +96,18 @@
             </thead>
             <tbody>
                 <%
-                    MapDAO mapDAO = new MapDAO();
-                    ArrayList<Map> list = mapDAO.getList();
+                    //MapDAO mapDAO = new MapDAO();
+                    //ArrayList<Map> list = mapDAO.getList();
+                    
+                    HospitalDAO hospitalDAO = new HospitalDAO();
+                    ArrayList<Hospital> list = hospitalDAO.getList();
                     
                 %>
                 
                 
             </tbody>
         </table>
+        <p id="result"></p>
     </div>
 </div>
 	
@@ -114,42 +118,163 @@
 	var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
 	var options = { //지도를 생성할 때 필요한 기본 옵션
 		center: new kakao.maps.LatLng(37.4484304, 126.6571886), //지도의 중심좌표.
-		level: 3 //지도의 레벨(확대, 축소 정도)
+		level: 3, //지도의 레벨(확대, 축소 정도)
+	    minLevel: 1,
+	    maxLevel: 5
 	};
 
 	var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
 	var infowindow = new kakao.maps.InfoWindow();
 	
-	<% for (int i = 0; i < list.size(); i++) { %>
-    var markerPosition = new kakao.maps.LatLng(<%= list.get(i).getLatitude() %>, <%= list.get(i).getLongitude() %>);
-    var marker = new kakao.maps.Marker({
-        position: markerPosition,
-        title: '<%= list.get(i).getMapID() %>' // 마커에 병원 이름 표시
-    });
-    marker.setMap(map); // 마커를 지도에 표시
+	function getImageWidth() {
+        var zoomLevel = map.getLevel(); // 현재 지도 레벨
+        return (50 / zoomLevel) * 2; // 레벨에 따른 비율로 이미지 크기 조정
+    }
+	var imagewidth = getImageWidth();
+	
+	function getInfoWindowSize() {
+	    var zoomLevel = map.getLevel(); // 현재 지도 레벨
+	    var baseSize = 300; // 기본 크기
+	    var maxLevel = 10; // 최대 레벨 예시
+	    return baseSize * (maxLevel - zoomLevel + 1) / maxLevel;
+	}
+	function getMarkerImage(hospitalType) {
+	    var imageSrc; 
+	    switch(hospitalType) {
+	        case '상급병원':
+	            imageSrc = 'path/to/general_hospital_marker.png'; // 종합병원 마커 이미지
+	            break;
+	        case '전문병원':
+	            imageSrc = 'path/to/specialized_hospital_marker.png'; // 전문병원 마커 이미지
+	            break;
+	        case '의원':
+	            imageSrc = 'path/to/clinic_marker.png'; // 의원 마커 이미지
+	            break;
+	        default:
+	            imageSrc = 'path/to/default_marker.png'; // 기본 마커 이미지
+	            break;
+	    }
+	    var imageSize = new kakao.maps.Size(24, 35); // 마커 이미지 크기
+	    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+	    return markerImage;
+	}
 
-    (function(marker, data) {
-        kakao.maps.event.addListener(marker, 'click', function() {
-            var content = `
-                <div style="padding:10px;">
-                    <table border="1" style="border-collapse:collapse; text-align:left;">
-                        <tr>
-                            <th>이름</th><td><%= list.get(i).getMapID() %></td>
-                        </tr>
-                        <tr>
-                            <th>주소</th><td>주소 정보</td> 
-                        </tr>
-                    </table>
-                </div>
-            `;
-            infowindow.setContent(content); // 인포윈도우 내용 설정
-            infowindow.open(map, marker); // 인포윈도우 열기
+
+
+	
+
+
+    <% for (int i = 0; i < list.size(); i++) { %>
+        var markerPosition = new kakao.maps.LatLng(<%= list.get(i).getLatitude() %>, <%= list.get(i).getLongitude() %>);
+        var marker = new kakao.maps.Marker({
+            position: markerPosition,
+            title: '<%= list.get(i).getHospital_id() %>' // 마커에 병원 이름 표시
+            
         });
-    })(marker, {
-        name: '<%= list.get(i).getMapID() %>',
-        address: '주소 정보' 
-    });
-<% } %>
+        marker.setMap(map); // 마커를 지도에 표시
+        
+        
+        
+        
+        (function(marker, data) {
+            kakao.maps.event.addListener(marker, 'click', function() {
+                var infowindowWidth = getImageWidth()
+                var content = `
+                    <div style="padding:10px;"> 
+                        <img src="<%= list.get(i).getImage() %>" alt="Hospital image" style="width:200px; height: 200px;">
+                        <br>
+                    	<%= list.get(i).getHospital_name() %><br>
+                    	<%= list.get(i).getAddress() %><br>
+                    	<%= list.get(i).getType() %><br>
+                    </div>
+                `;
+                
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+            });
+        })(marker, {
+            name: '<%= list.get(i).getHospital_name() %>',
+            address: '주소 정보'
+        });
+        kakao.maps.event.addListener(map, 'click', function() {
+            infowindow.close();
+        }); //맵을 클릭했을때 마커를 닫히게 하는 이벤트
+
+        kakao.maps.event.addListener(map, 'zoom_changed', function() {
+            // 인포윈도우가 열려 있는 상태라면 이미지 크기 업데이트
+          //var imagewidth = getImageWidth();
+          //var infowindowsize = getInfoWindowSize();
+          //var infowindowhsize = getInfoWindowSize();
+          //console.log("Updated InfoWindow Size: ", infowindowsize);
+          //console.log("Updated InfoWindow hSize: ", infowindowhsize);
+          //var message = '현재 지도 레벨은 ' + infowindowsize + ' 입니다';
+          //var resultDiv = document.getElementById('result');  
+          //resultDiv.innerHTML = message;
+          var level =map.getLevel();
+          var infowindowWidth;
+          var infowindowHeight;
+          var imagewidth;
+          var imageHeight;
+          
+          switch(level) {
+          case 1:
+              infowindowWidth = 250;
+              infowindowHeight = 300;
+              imagewidth = 200;
+              imageHeight = 200;
+              break;
+          case 2:
+              infowindowWidth = 200;
+              infowindowHeight = 240;
+              imagewidth =140;
+              imageHeight =140;
+              break;
+          case 3:
+              infowindowWidth = 190;
+              infowindowHeight = 220;
+              imagewidth =120;
+              imageHeight = 120;
+              break;
+          case 4:
+              infowindowWidth = 180;
+              infowindowHeight = 210;
+              imagewidth = 100;
+              imageHeight = 100;
+              break;
+          case 5:
+              infowindowWidth = 160;
+              infowindowHeight = 190;
+              imagewidth = 90;
+              imageHeight = 90;
+              break ;
+          default:
+              infowindowWidth = 150;
+              infowindowHeight = 75;
+              imagewidth = 20;
+              imageHeight = 20;
+              break;
+      }
+
+    
+            
+            if (infowindow.getMap()) {
+                var updatedContent = `
+                    <div style="padding:10px; width:\${infowindowWidth}px; height:\${infowindowHeight}px;">
+                        <img src="<%= list.get(i).getImage() %>" alt="Hospital image " 
+                        	style="width:\${imagewidth}px; height:\${imageHeight}px;">
+                        	<br>
+                        	<%= list.get(i).getHospital_name() %><br>
+                        	<%= list.get(i).getAddress() %><br>
+                        	<%= list.get(i).getType() %><br>
+                        
+                    </div>
+                `;
+                infowindow.setContent(updatedContent); // 확대/축소된 이미지 크기 반영
+            }
+        }); 
+        
+    <% } %>
+
 
     
 	
