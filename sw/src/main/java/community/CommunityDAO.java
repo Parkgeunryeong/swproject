@@ -35,7 +35,7 @@ public class CommunityDAO {
 		}
 		return ""; // 데이터베이스 오류
 		}
-	public int getNext() {
+	public int getNext() { //게시글번호 가져오는 부분
 		String SQL = "SELECT com_id FROM community ORDER BY com_id DESC"; 
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(SQL); 
@@ -54,10 +54,10 @@ public class CommunityDAO {
 		String SQL = "INSERT INTO community VALUES(?, ?, ?, ?, ?, ?)"; 
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(SQL); 
-			pstmt.setInt(1, getNext());
+			pstmt.setInt(1, getNext());  //db부분에서 값 가져와 보기
 			pstmt.setString(2, com_title);
 			pstmt.setString(3, userID);
-			pstmt.setString(4, getDate());
+			pstmt.setString(4, getDate()); // db에서 타임스탬프로 정의해서 넣기(db데이터 넣기) select now로 가져오기 시박 번호물,가져올데이터수
 			pstmt.setString(5, com_content);
 			pstmt.setInt(6, 1) ; //글이 보여지는 형태 1
 			return pstmt.executeUpdate();
@@ -68,7 +68,7 @@ public class CommunityDAO {
 	}
 	
 	public ArrayList<Community> getList(int pageNumber) { 
-		String SQL = "SELECT * FROM Community WHERE com_id < ? AND comAvailable = 1 ORDER BY com_id DESC LIMIT 10";
+		String SQL = "SELECT * FROM Community WHERE com_id < ? AND comAvailable = 1 ORDER BY com_id DESC LIMIT 10"; //mysql오프셋이나 쉼표해서 이용
 		ArrayList<Community> list = new ArrayList<Community>();
 		try {
 			PreparedStatement pstmt = conn.prepareStatement(SQL); 

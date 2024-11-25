@@ -3,6 +3,7 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="hospital.Hospital" %>
 <%@ page import="hospital.HospitalDAO" %>
+<%@ page import="hospital.DepartmentDAO" %>
 <%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
@@ -38,7 +39,7 @@
            <ul class="nav navbar-nav">
               <li class="active"><a href="main.jsp">메인</a></li>
               <li><a href="map.jsp">지도로 병원찾기</a></li>
-              <li><a href="">병원 검색하기</a></li>
+              <li><a href="select.jsp">병원 검색하기</a></li>
               <li class="dropdown">
 		            <a href="#" class="dropdown-toggle"
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -158,6 +159,7 @@
 	    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
 	    return markerImage;
 	}
+	var hospitals =[];
 
 
 
@@ -176,6 +178,9 @@
         
         
         
+        
+        
+        
         (function(marker, data) {
             kakao.maps.event.addListener(marker, 'click', function() {
                 var infowindowWidth = getImageWidth()
@@ -186,6 +191,10 @@
                     	<%= list.get(i).getHospital_name() %><br>
                     	<%= list.get(i).getAddress() %><br>
                     	<%= list.get(i).getType() %><br>
+                    	<h4>진료과목</h4>
+                    	<ul> <% for (String department : list.get(i).getDepartments()) { %> 
+                    	<li><%= department %></li> 
+                    	<% } %> </ul>
                     </div>
                 `;
                 
@@ -219,7 +228,7 @@
           switch(level) {
           case 1:
               infowindowWidth = 250;
-              infowindowHeight = 300;
+              infowindowHeight = 400;
               imagewidth = 200;
               imageHeight = 200;
               break;
@@ -258,6 +267,7 @@
     
             
             if (infowindow.getMap()) {
+            	
                 var updatedContent = `
                     <div style="padding:10px; width:\${infowindowWidth}px; height:\${infowindowHeight}px;">
                         <img src="<%= list.get(i).getImage() %>" alt="Hospital image " 
@@ -266,6 +276,11 @@
                         	<%= list.get(i).getHospital_name() %><br>
                         	<%= list.get(i).getAddress() %><br>
                         	<%= list.get(i).getType() %><br>
+                        	<h4>진료과목</h4>
+                        	<ul> <% for (String department : list.get(i).getDepartments()) { %> 
+                        	<li><%= department %></li> 
+                        	<% } %> </ul>
+                        	
                         
                     </div>
                 `;

@@ -6,6 +6,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import hospital.DepartmentDAO;
+
 
 
 public class HospitalDAO {
@@ -28,6 +30,7 @@ public class HospitalDAO {
 	}
 	public ArrayList<Hospital> getList() {
 	    ArrayList<Hospital> list = new ArrayList<Hospital>();
+	    DepartmentDAO departmentDAO = new DepartmentDAO();
 	    String SQL = "SELECT * FROM hospital ";
 	    
 	    try {
@@ -46,6 +49,9 @@ public class HospitalDAO {
 	            hospital.setLatitude(rs.getBigDecimal(7));
 	            hospital.setLongitude(rs.getBigDecimal(8));
 	            hospital.setImage(rs.getString(9));
+	            
+	            ArrayList<String> departments = departmentDAO.getDepartmentsByHospitalId(hospital.getHospital_id()); 
+	            hospital.setDepartments(departments);
 	            
 	            
 	            list.add(hospital);

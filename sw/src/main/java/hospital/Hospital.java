@@ -1,6 +1,7 @@
 package hospital;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 public class Hospital {
 	private String hospital_id;
 	private String hospital_name;
@@ -11,7 +12,14 @@ public class Hospital {
 	private BigDecimal latitude;
 	private BigDecimal longitude;
 	private String image;
+	private ArrayList<String> departments;
 	
+	public ArrayList<String> getDepartments() {
+		return departments;
+	}
+	public void setDepartments(ArrayList<String> departments) {
+		this.departments = departments;
+	}
 	public String getHospital_id() {
 		return hospital_id;
 	}
