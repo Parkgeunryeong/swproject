@@ -3,6 +3,17 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="hospital.KeywordDAO" %>
 <%@ page import="java.util.ArrayList" %>
+ <%
+   if ("autocomplete".equals(request.getParameter("action"))) {
+	   KeywordDAO keyworddao = new KeywordDAO();
+	   String keyword = request.getParameter("keyword");
+    ArrayList<String> keywords = keyworddao.getKeywordsByKeyword(keyword);
+    for (String kw : keywords) {
+        out.println("<li class='autocomplete-suggestion'>" + kw + "</li>");
+    }
+    return; // 자동 완성 요청에 대한 응답만 처리
+}
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +21,54 @@
 <link rel="stylesheet" href="css/bootstrap.css">
 <link rel="stylesheet" href="css/custom.css">
 <title>Insert title here</title>
+<style>
+    .autocomplete-suggestions {
+        border: 1px solid #ccc;
+        background: #fff;
+        max-height: 150px;
+        overflow-y: auto;
+        position: absolute;
+        width: 300px; /* 검색창과 동일한 너비로 설정 */
+        margin-top: 5px; /* 검색창과의 간격 */
+        z-index: 1000; /* 다른 요소보다 위에 표시 */
+    }
+    .autocomplete-suggestions li {
+        padding: 10px;
+        cursor: pointer;
+        list-style: none; /* 리스트 스타일 제거 */
+    }
+    .autocomplete-suggestions li:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#keyword").keyup(function(){
+        var query = $(this).val();
+        if (query != "") {
+            $.ajax({
+                url: 'select.jsp',
+                method: 'GET',
+                data: { keyword: query, action: 'autocomplete' },
+                success: function(data) {
+                    $("#keywordList").fadeIn();
+                    $("#keywordList").html(data);
+                }
+            });
+        } else {
+            $("#keywordList").fadeOut();
+            $("#keywordList").html("");
+        }
+    });
+    $(document).on('click', 'li', function(){
+        $('#keyword').val($(this).text());
+        $('#keywordList').fadeOut();
+    });
+});
+</script>
+
 </head>
 <body>
 <%
@@ -43,7 +102,7 @@
 		               aria-expanded="false">의료정보게시판<span class="caret"></span></a>
 		            <ul class="dropdown-menu">
 		               <li><a href="">의료 공지</a>
-		               <li><a href="">의료 커뮤니티 게시판</a>
+		               <li><a href="community_info.jsp">의료 커뮤니티 게시판</a>
 		            </ul>
 		           </li>
     
@@ -89,19 +148,14 @@
       병원 검색
       
     <form action="result.jsp" method="get">
-        <select name="keyword">
-            <option value="">증상을 선택하세요</option>
-            <%
-                for (String keyword : list) {
-                    out.print("<option value=\"" + keyword + "\">" + keyword + "</option>");
-                }
-            %>
-        </select>
+        <input type="text" id="keyword" name="keyword" placeholder="증상을 입력하세요"> 
+        <div id="keywordList" class="autocomplete-suggestions"></div>
+  
         <button type="submit">검색</button>
     </form>
-    <div id="result">
-        <!-- 검색 결과 표시 영역 -->
-    </div>
+    
+    
+    
 
       
       

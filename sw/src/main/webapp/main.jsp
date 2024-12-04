@@ -34,14 +34,14 @@
            <ul class="nav navbar-nav">
               <li class="active"><a href="main.jsp">메인</a></li>
               <li><a href="map.jsp">지도로 병원찾기</a></li>
-              <li><a href="">병원 검색하기</a></li>
+              <li><a href="select.jsp">병원 검색하기</a></li>
               <li class="dropdown">
 		            <a href="#" class="dropdown-toggle"
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
 		               aria-expanded="false">의료정보게시판<span class="caret"></span></a>
 		            <ul class="dropdown-menu">
 		               <li><a href="">의료 공지</a>
-		               <li><a href="">의료 커뮤니티 게시판</a>
+		               <li><a href="community.jsp">의료 커뮤니티 게시판</a>
 		            </ul>
 		           </li>
     
@@ -70,7 +70,7 @@
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
 		               aria-expanded="false">회원관리<span class="caret"></span></a>
 		            <ul class="dropdown-menu">
-		               <li><a href="">내 정보</a></li>
+		               <li><a href="userpro.jsp">내 정보</a></li>
 		               <li><a href="logoutAction.jsp">로그아웃</a></li>
 		            </ul>
 		           </li>

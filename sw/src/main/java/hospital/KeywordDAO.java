@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 public class KeywordDAO {
@@ -96,6 +97,109 @@ public class KeywordDAO {
 	    }
 	    return hospitals;
 	}
+	public ArrayList<String> getKeywordsByKeyword(String keyword) {
+	    ArrayList<String> keywords = new ArrayList<>();
+	    String SQL = "SELECT name FROM keyword WHERE name LIKE ?";
+
+	    try {
+	    	System.out.println("DAO로 전달된 키워드: " + keyword);
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, keyword + "%");
+	        ResultSet rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            keywords.add(rs.getString("name"));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return keywords;
+	} // 자동검색 기능을 위한 메서드
+	public int getKeywordIdByName(String keyword) { // 키워드를 바탕으로 키워드 id를 찾는 메서드
+	    String SQL = "SELECT keyword_id FROM keyword WHERE name = ?";
+	    try {
+	    	System.out.println("DAO로 전달된 키워드: " + keyword);
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, keyword);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt(1); // keyword_id 반환
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return -1; // keyword_id를 찾지 못했을 경우
+	}
+	public int getKeywordCountByUser(String userId) { //한 사람당 키워드 저장값이 3개를 초과할없게하는 메서드
+	    String SQL = "SELECT COUNT(*) FROM u_k_mapping WHERE userID = ?";
+	    try {
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, userId);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt(1); // 키워드 개수를 반환
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return -1; // 에러 발생 시 -1 반환
+	}
+	public boolean isKeywordAlreadySaved(String userId, int keywordId) { // 키워드 중복을 확인하는 메서드
+	    String SQL = "SELECT COUNT(*) FROM u_k_mapping WHERE userID = ? AND keyword_id = ?";
+	    try {
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, userId);
+	        pstmt.setInt(2, keywordId);
+	        rs = pstmt.executeQuery();
+	        if (rs.next()) {
+	            return rs.getInt(1) > 0; // 이미 저장된 키워드가 있으면 true 반환
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return false; // 에러 발생 시 false 반환
+	}
+	public int insertMapping(String userID, int keywordId) { //사용자id와 키워드 id를 바탕으로 매핑테이블에 저장
+	    String SQL = "INSERT INTO u_k_mapping (userID, keyword_id) VALUES (?, ?)";
+	    try {
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, userID);
+	        pstmt.setInt(2, keywordId);
+	        return pstmt.executeUpdate(); // 성공 시 1 반환
+	    } catch (SQLIntegrityConstraintViolationException e) {
+	        // 유니크 제약 조건 위반 발생 시
+	        System.out.println("중복된 키워드입니다: " + e.getMessage());
+	        return -1; } // 중복된 키워드인 경우 -1 반환 
+	    catch (Exception e) {
+	        e.printStackTrace();
+	        return 0; // 삽입 실패 시
+	    }
+	    
+	}
+	public ArrayList<String> getUserKeywords(String userId) { // 현재 사용자가 저장해둔 키워드를 반환해주는 메서드
+	    String SQL = "SELECT k.name " +
+	                 "FROM keyword k " +
+	                 "JOIN u_k_mapping ukm ON k.keyword_id = ukm.keyword_id " +
+	                 "WHERE ukm.userID = ?";
+	    ArrayList<String> keywords = new ArrayList<>();
+	    try {
+	        PreparedStatement pstmt = conn.prepareStatement(SQL);
+	        pstmt.setString(1, userId);
+	        rs = pstmt.executeQuery();
+	        while (rs.next()) {
+	            keywords.add(rs.getString("name")); // 키워드 이름 추가
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return keywords; // 키워드 리스트 반환
+	}
+
+	
+
+
+	
+
+
 	
 	
 	

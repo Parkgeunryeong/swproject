@@ -3,7 +3,6 @@
 <%@ page import="java.io.PrintWriter" %>
 <%@ page import="hospital.KeywordDAO" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="hospital.Hospital" %>
  <%
    if ("autocomplete".equals(request.getParameter("action"))) {
 	   KeywordDAO keyworddao = new KeywordDAO();
@@ -42,6 +41,7 @@
         background-color: #f0f0f0;
     }
 </style>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function(){
@@ -49,7 +49,7 @@ $(document).ready(function(){
         var query = $(this).val();
         if (query != "") {
             $.ajax({
-                url: 'select.jsp',
+                url: 'userpro.jsp',
                 method: 'GET',
                 data: { keyword: query, action: 'autocomplete' },
                 success: function(data) {
@@ -70,14 +70,15 @@ $(document).ready(function(){
 </script>
 </head>
 <body>
-<%
+ <%
         String userID = null;
         if (session.getAttribute("userID") != null) {
         	userID = (String) session.getAttribute("userID");
         }
+        int pageNumber =1;
     
     %>
-       <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default">
            <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed"
                 data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
@@ -92,9 +93,9 @@ $(document).ready(function(){
            </div>
            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
            <ul class="nav navbar-nav">
-              <li><a href="main.jsp">메인</a></li>
+              <li class="active"><a href="main.jsp">메인</a></li>
               <li><a href="map.jsp">지도로 병원찾기</a></li>
-              <li class="active"><a href="">병원 검색하기</a></li>
+              <li><a href="select.jsp">병원 검색하기</a></li>
               <li class="dropdown">
 		            <a href="#" class="dropdown-toggle"
 		               data-toggle="dropdown" role="button" aria-haspopup="true"
@@ -104,8 +105,6 @@ $(document).ready(function(){
 		               <li><a href="">의료 커뮤니티 게시판</a>
 		            </ul>
 		           </li>
-    
-                    
            </ul>
             <%
 		         if(userID == null) {
@@ -143,89 +142,64 @@ $(document).ready(function(){
       <%
         KeywordDAO keyworddao = new KeywordDAO();
         ArrayList<String> list = keyworddao.getkeyword();
+        ArrayList<String> userKeywords = keyworddao.getUserKeywords(userID); // ArrayList로 키워드 가져오기
       %>
-      병원 검색
-      
-     <form action="result.jsp" method="get">
-        <input type="text" id="keyword" name="keyword" placeholder="증상을 입력하세요"> 
-        <div id="keywordList" class="autocomplete-suggestions"></div>
-  
-        <button type="submit">검색</button>
-    </form>
-    <div id="result">
-         <br><br><br><br>
-
-    <%
-        String selectedKeyword = request.getParameter("keyword"); // 선택한 키워드 값 가져오기
-        KeywordDAO keywordDAO = new KeywordDAO();
-        ArrayList<Hospital> hospitals = keywordDAO.getHospitalsByKeyword(selectedKeyword); // 병원 리스트 가져오기
-        session.setAttribute("selectedHospitals", hospitals);
-    %>
-
-    <p><b>선택된 키워드:</b> <%= selectedKeyword %></p>
-
+       
     <ul>
-        <%
-            if (hospitals.isEmpty()) {
-        %>
-            <li>검색된 병원이 없습니다.</li>
-        <%
-            } else {
-                for (Hospital hospital : hospitals) {
-        %>
-            <li><%= hospital.getHospital_name() %> </li>
-        <%
-                }
-            }
-        %>
+       
     </ul>
+     <div class="container">
+    <div class="col-lg-8">
+        <div class="col-lg-8">
+            <!-- 검색창 및 키워드 저장 -->
+            <div class="jumbotron" style="padding-top: 20px; padding-bottom: 20px;">
+                 <h4 style="text-align: center; margin-bottom: 20px;">
+                    안녕하세요, <strong><%= (String) session.getAttribute("userID") %></strong>님!
+                </h4>
+                <!-- 키워드 저장 폼 -->
+                <form method="post" action="savekeyword.jsp">
+                    <h3 style="text-align: center; margin-bottom: 20px;">키워드를 저장하세요</h3>
+                    <div class="form-group">
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="증상을 입력하세요">
+                        <div id="keywordList" class="autocomplete-suggestions"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">추가</button>
+                </form>
+                
+                <!-- 저장된 키워드 리스트 -->
+                <hr>
+                <h4 style="text-align: center; margin-top: 20px;">저장된 키워드</h4>
+                <ul class="list-group mt-3">
+                    <% 
+                        if (userKeywords != null && !userKeywords.isEmpty()) {
+                            for (String keyword : userKeywords) { 
+                    %>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <%= keyword %>
+                            <!-- 삭제 버튼 -->
+                            <form action="deleteKeyword.jsp" method="post" style="margin: 0;">
+                                <input type="hidden" name="keywordName" value="<%= keyword %>">
+                                <button type="submit" class="btn btn-danger btn-sm">삭제</button>
+                            </form>
+                        </li>
+                    <% 
+                            } 
+                        } else { 
+                    %>
+                        <li class="list-group-item text-center">저장된 키워드가 없습니다.</li>
+                    <% 
+                        } 
+                    %>
+                </ul>
+            </div>
+        </div>
     </div>
-    <div class="container">
-           <div class="row">
-                <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
-                      <thead>
-                             <tr>
-                             <th style="background-color: #eeeeee; text-align: center;">병원이름</th>
-                             <th style="background-color: #eeeeee; text-align: center;">병원종류</th>
-                             <th style="background-color: #eeeeee; text-align: center;">운영시간</th>
-                             
-                             
-                             </tr>
-                      </thead>
-                      <tbody>
-                    <%
-                        if (hospitals.isEmpty()) {
-                    %>
-                        <tr>
-                            <td colspan="3">검색된 병원이 없습니다.</td>
-                        </tr>
-                    <%
-                        } else {
-                            for (Hospital hospital : hospitals) {
-                    %>
-                        <tr>
-                            <td><a href ="viewhospital.jsp?hospital_id=<%= hospital.getHospital_id() %>"><%= hospital.getHospital_name() %></a></td>
-                            <td><%= hospital.getType() %></td>
-                            <td><%= hospital.getOpening_hours() %></td>
-                        </tr>
-                    <%
-                            }
-                        }
-                    %>
-                </tbody>
-                      
-                </table>
-                 
-                
-                </div>
-                </div>
-                
-
+</div>
       
-      
-      
-      <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-      <script src="js/bootstrap.js"></script>
-
+    
+    
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="js/bootstrap.js"></script>
 </body>
+
 </html>

@@ -85,17 +85,7 @@
       </nav>
       <div id="map" style="width: 700px; height: 600px;"></div> 
       <button id="getLocationBtn">내 위치로 이동</button>
-    <div class="container">
-    <div class="row">
-        <table class="table table-striped" style="text-align: center; border: 1px solid #dddddd">
-            <thead>
-                <tr>
-                    <th style="background-color: #eeeeee; text-align: center;">ID</th>
-                    <th style="background-color: #eeeeee; text-align: center;">위도</th>
-                    <th style="background-color: #eeeeee; text-align: center;">경도</th>
-                </tr>
-            </thead>
-            <tbody>
+   
                 <%
                     //MapDAO mapDAO = new MapDAO();
                     //ArrayList<Map> list = mapDAO.getList();
@@ -106,11 +96,7 @@
                 %>
                 
                 
-            </tbody>
-        </table>
-        <p id="result"></p>
-    </div>
-</div>
+            
 	
 	
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2b25b23781322b72673233144779d42f"></script>
@@ -139,26 +125,7 @@
 	    var maxLevel = 10; // 최대 레벨 예시
 	    return baseSize * (maxLevel - zoomLevel + 1) / maxLevel;
 	}
-	function getMarkerImage(hospitalType) {
-	    var imageSrc; 
-	    switch(hospitalType) {
-	        case '상급병원':
-	            imageSrc = 'path/to/general_hospital_marker.png'; // 종합병원 마커 이미지
-	            break;
-	        case '전문병원':
-	            imageSrc = 'path/to/specialized_hospital_marker.png'; // 전문병원 마커 이미지
-	            break;
-	        case '의원':
-	            imageSrc = 'path/to/clinic_marker.png'; // 의원 마커 이미지
-	            break;
-	        default:
-	            imageSrc = 'path/to/default_marker.png'; // 기본 마커 이미지
-	            break;
-	    }
-	    var imageSize = new kakao.maps.Size(24, 35); // 마커 이미지 크기
-	    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
-	    return markerImage;
-	}
+	
 	var hospitals =[];
 
 
